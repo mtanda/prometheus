@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/golang/glog"
+
 	clientmodel "github.com/prometheus/client_golang/model"
 
 	"github.com/prometheus/prometheus/utility"
@@ -67,7 +68,7 @@ func (c *Client) Store(samples clientmodel.Samples) error {
 	for _, s := range samples {
 		v := float64(s.Value)
 		if math.IsNaN(v) || math.IsInf(v, 0) {
-			glog.Warningf("cannot send value %d to OpenTSDB, skipping sample %#v", v, s)
+			glog.Warningf("cannot send value %f to OpenTSDB, skipping sample %#v", v, s)
 			continue
 		}
 		metric := TagValue(s.Metric[clientmodel.MetricNameLabel])
