@@ -261,14 +261,11 @@ func (api *API) alerts(r *http.Request) (interface{}, *apiError) {
 	alerts := api.ruleManager.AlertingRules()
 
 	res := struct {
-		name        string      `json:"name"`
-		vector      promql.Expr `json:"expr"`
-		summary     string      `json:"summary"`
-		description string      `json:"description"`
+		alerts []*rules.AlertingRule
 	}{
-		NumDeleted: len(fps),
+		alerts: alerts,
 	}
-	return alerts, nil
+	return res, nil
 }
 
 func respond(w http.ResponseWriter, data interface{}) {
