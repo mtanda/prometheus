@@ -101,7 +101,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 
 	for fp, chunks := range fpToChunks {
 		firstTimeNotDropped, offset, numDropped, allDropped, err :=
-			p.dropAndPersistChunks(fp, model.Earliest, chunks)
+			p.dropAndPersistChunks(fp, model.Earliest, chunks, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -194,7 +194,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	}
 	// Drop half of the chunks.
 	for fp, expectedChunks := range fpToChunks {
-		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 5, nil)
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 5, nil, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -226,7 +226,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	}
 	// Drop all the chunks.
 	for fp := range fpToChunks {
-		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 100, nil)
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 100, nil, nil)
 		if firstTime != 0 {
 			t.Errorf("want first time 0, got %d", firstTime)
 		}
@@ -246,7 +246,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	// Re-add first two of the chunks.
 	for fp, chunks := range fpToChunks {
 		firstTimeNotDropped, offset, numDropped, allDropped, err :=
-			p.dropAndPersistChunks(fp, model.Earliest, chunks[:2])
+			p.dropAndPersistChunks(fp, model.Earliest, chunks[:2], nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -265,7 +265,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	}
 	// Drop the first of the chunks while adding two more.
 	for fp, chunks := range fpToChunks {
-		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 1, chunks[2:4])
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 1, chunks[2:4], nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -298,7 +298,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	}
 	// Drop all the chunks while adding two more.
 	for fp, chunks := range fpToChunks {
-		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 4, chunks[4:6])
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 4, chunks[4:6], nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -331,7 +331,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	}
 	// While adding two more, drop all but one of the added ones.
 	for fp, chunks := range fpToChunks {
-		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 7, chunks[6:8])
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 7, chunks[6:8], nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -364,7 +364,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	}
 	// While adding two more, drop all chunks including the added ones.
 	for fp, chunks := range fpToChunks {
-		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 10, chunks[8:])
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 10, chunks[8:], nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -386,7 +386,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	// Re-add 8 chunks.
 	for fp, chunks := range fpToChunks {
 		firstTimeNotDropped, offset, numDropped, allDropped, err :=
-			p.dropAndPersistChunks(fp, model.Earliest, chunks[:8])
+			p.dropAndPersistChunks(fp, model.Earliest, chunks[:8], nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -405,7 +405,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	}
 	// Drop only the first chunk should not happen, but persistence should still work.
 	for fp, chunks := range fpToChunks {
-		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 1, chunks[8:9])
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 1, chunks[8:9], nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -424,7 +424,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	}
 	// Drop only the first two chunks should not happen, either.
 	for fp := range fpToChunks {
-		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 2, nil)
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 2, nil, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -443,7 +443,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	}
 	// Drop the first three chunks should finally work.
 	for fp, chunks := range fpToChunks {
-		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 3, chunks[9:])
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 3, chunks[9:], nil)
 		if err != nil {
 			t.Fatal(err)
 		}

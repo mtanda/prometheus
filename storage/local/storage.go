@@ -1481,7 +1481,7 @@ func (s *MemorySeriesStorage) writeMemorySeries(
 	}
 
 	newFirstTime, offset, numDroppedFromPersistence, allDroppedFromPersistence, persistErr :=
-		s.persistence.dropAndPersistChunks(fp, beforeTime, chunks)
+		s.persistence.dropAndPersistChunks(fp, beforeTime, chunks, nil)
 	if persistErr != nil {
 		return false
 	}
@@ -1529,7 +1529,7 @@ func (s *MemorySeriesStorage) maintainArchivedSeries(fp model.Fingerprint, befor
 
 	defer s.seriesOps.WithLabelValues(archiveMaintenance).Inc()
 
-	newFirstTime, _, _, allDropped, err := s.persistence.dropAndPersistChunks(fp, beforeTime, nil)
+	newFirstTime, _, _, allDropped, err := s.persistence.dropAndPersistChunks(fp, beforeTime, nil, lastTime)
 	if err != nil {
 		log.Error("Error dropping persisted chunks: ", err)
 	}
