@@ -324,6 +324,17 @@ func (api *API) dropSeries(r *http.Request) (interface{}, *apiError) {
 		return nil, &apiError{errorBadData, fmt.Errorf("no match[] parameter provided")}
 	}
 
+	var end model.Time
+	if t := r.FormValue("end"); t != "" {
+		var err error
+		end, err = parseTime(t)
+		if err != nil {
+			return nil, &apiError{errorBadData, err}
+		}
+	} else {
+		end = model.Latest
+	}
+
 	numDeleted := 0
 	for _, s := range r.Form["match[]"] {
 		matchers, err := promql.ParseMetricSelector(s)
