@@ -899,42 +899,45 @@ func (p *persistence) dropAndPersistChunks(
 
 	headerBuf := make([]byte, chunkHeaderLen)
 	var firstTimeInFile model.Time
-	// Find the first chunk in the file that should be kept.
-	for ; ; numDropped++ {
-		_, err = f.Seek(offsetForChunkIndex(numDropped), os.SEEK_SET)
-		if err != nil {
-			return
-		}
-		_, err = io.ReadFull(f, headerBuf)
-		if err == io.EOF {
-			// Close the file before trying to delete it. This is necessary on Windows
-			// (this will cause the defer f.Close to fail, but the error is silently ignored)
-			f.Close()
-			// We ran into the end of the file without finding any chunks that should
-			// be kept. Remove the whole file.
-			if numDropped, err = p.deleteSeriesFile(fp); err != nil {
+
+	if p.minShrinkRatio < 1 {
+		// Find the first chunk in the file that should be kept.
+		for ; ; numDropped++ {
+			_, err = f.Seek(offsetForChunkIndex(numDropped), os.SEEK_SET)
+			if err != nil {
 				return
 			}
-			if len(chunks) == 0 {
-				allDropped = true
+			_, err = io.ReadFull(f, headerBuf)
+			if err == io.EOF {
+				// Close the file before trying to delete it. This is necessary on Windows
+				// (this will cause the defer f.Close to fail, but the error is silently ignored)
+				f.Close()
+				// We ran into the end of the file without finding any chunks that should
+				// be kept. Remove the whole file.
+				if numDropped, err = p.deleteSeriesFile(fp); err != nil {
+					return
+				}
+				if len(chunks) == 0 {
+					allDropped = true
+					return
+				}
+				offset, err = p.persistChunks(fp, chunks)
 				return
 			}
-			offset, err = p.persistChunks(fp, chunks)
-			return
-		}
-		if err != nil {
-			return
-		}
-		if numDropped == 0 {
-			firstTimeInFile = model.Time(
-				binary.LittleEndian.Uint64(headerBuf[chunkHeaderFirstTimeOffset:]),
+			if err != nil {
+				return
+			}
+			if numDropped == 0 {
+				firstTimeInFile = model.Time(
+					binary.LittleEndian.Uint64(headerBuf[chunkHeaderFirstTimeOffset:]),
+				)
+			}
+			lastTime := model.Time(
+				binary.LittleEndian.Uint64(headerBuf[chunkHeaderLastTimeOffset:]),
 			)
-		}
-		lastTime := model.Time(
-			binary.LittleEndian.Uint64(headerBuf[chunkHeaderLastTimeOffset:]),
-		)
-		if !lastTime.Before(beforeTime) {
-			break
+			if !lastTime.Before(beforeTime) {
+				break
+			}
 		}
 	}
 
