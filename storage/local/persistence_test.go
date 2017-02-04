@@ -462,7 +462,7 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 	}
 	// Drop all the chunks.
 	for fp := range fpToChunks {
-		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 100, nil, nil)
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 100, nil, 9)
 		if firstTime != 0 {
 			t.Errorf("want first time 0, got %d", firstTime)
 		}
