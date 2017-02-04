@@ -816,7 +816,7 @@ func (p *persistence) loadSeriesMapAndHeads() (sm *seriesMap, chunksToPersist in
 // Returning an error signals problems with the series file. In this case, the
 // caller should quarantine the series.
 func (p *persistence) dropAndPersistChunks(
-	fp model.Fingerprint, beforeTime model.Time, chunks []chunk.Chunk, chunklastTime model.Time,
+	fp model.Fingerprint, beforeTime model.Time, chunks []chunk.Chunk, seriesLastTime model.Time,
 ) (
 	firstTimeNotDropped model.Time,
 	offset int,
@@ -880,7 +880,7 @@ func (p *persistence) dropAndPersistChunks(
 	defer f.Close()
 
 
-	if chunkLastTIme.Before(beforeTime) {
+	if seriesLastTime.Before(beforeTime) {
 		// Close the file before trying to delete it. This is necessary on Windows
 		// (this will cause the defer f.Close to fail, but the error is silently ignored)
 		f.Close()
