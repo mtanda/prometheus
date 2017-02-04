@@ -460,6 +460,25 @@ func testPersistLoadDropChunks(t *testing.T, encoding chunk.Encoding) {
 			t.Error("all chunks dropped")
 		}
 	}
+	// Drop all the chunks.
+	for fp := range fpToChunks {
+		firstTime, offset, numDropped, allDropped, err := p.dropAndPersistChunks(fp, 100, nil, nil)
+		if firstTime != 0 {
+			t.Errorf("want first time 0, got %d", firstTime)
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		if offset != 0 {
+			t.Errorf("want offset 0, got %d", offset)
+		}
+		if numDropped != 5 {
+			t.Errorf("want 5 dropped chunks, got %v", numDropped)
+		}
+		if !allDropped {
+			t.Error("not all chunks dropped")
+		}
+	}
 }
 
 func TestPersistLoadDropChunksType0(t *testing.T) {
